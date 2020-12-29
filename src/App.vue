@@ -5,6 +5,9 @@
   <header>
     <h1>My Music</h1>
   </header>
+  
+  <!-- Main Container For Elements -->
+  <main>
 
   <!-- Player itself -->
   <section class="player">
@@ -14,10 +17,24 @@
 
   <!-- Control Buttons -->
   <div class="controls">
-   <button class="regular">Prev</button>
-   <button class="play" @click="playMusic">Play</button>
+   <button class="regular" @click="prevSong">Prev</button>
+   <button class="play" @click="playMusic" v-if="!isPlaying">Play</button>
+   <button class="play pause" @click="pause" v-else>Pause</button>
    <button class="regular" @click="nextSong">Next</button> 
   </div>
+
+  <!-- Playlist Section -->
+  <section class="playlist">
+   <h2>The Playlist</h2>
+   <p :key="song.src" v-for="song in songs" 
+   @click="playMusic(song)"
+   :class="(song.src == current.src) ? 'song-playing' : 'song'"
+   >
+   {{ song.title }} - {{ song.artist }}
+   </p>
+  </section>
+
+  </main>
 
   </div>
 </template>
@@ -38,6 +55,9 @@ export default {
   
   // By default it's 0 (first song)
   index: 0,
+
+  // Checking if the song is being played right now
+  isPlaying : false,
   
   // Songs array
   songs: [
@@ -66,7 +86,7 @@ export default {
   },
   
   // Lifecycle Hook (When element has been created)
-  created() {
+  created() {  
   // current object = songs array of objects with index (which is currently 0)
   this.current = this.songs[this.index]; //So here the first song should appear
   // Setting Up Player's source
@@ -76,12 +96,46 @@ export default {
   },
 
   methods: {
-  playMusic() {
-  this.player.play();
-  },
+  
+  // Start Playing Music
+  playMusic(song) {  
 
+  // If song's source is undefined
+  if(typeof song.src != 'undefined') {
+  // This current object = song
+  this.current = song;
+  // This player source = Current object source
+  this.player.src = this.current.src;
+  }
+  
+  this.player.play();
+  this.isPlaying = true;
+  },
+  
+  // Pause song
+  pause() {
+  this.player.pause();
+  this.isPlaying = false;
+  },
+  
+  // Play Next Song
   nextSong() {
   this.index++;  
+  if(this.index > this.songs.length - 1) { //If index is longer then the last elem
+  this.index = 0; //We are back to the first song
+  }
+  this.current = this.songs[this.index];
+  this.playMusic(this.current);
+  },
+
+  // Play Prev Song
+  prevSong() {
+  this.index--;  
+  if(this.index < 0) { //If index is longer then the last elem
+  this.index = this.songs.length - 1; //We are back to the first song
+  }
+  this.current = this.songs[this.index];
+  this.playMusic(this.current);
   }
 
   },
@@ -109,9 +163,13 @@ background: #212121;
 color: #fff;
 }
 
+main{
+width: 100%;
+margin: 25px auto;
+}
+
 .player{
 text-align: center;
-margin-top: 20px;
 }
 
 .controls{
@@ -124,6 +182,7 @@ margin-top: 20px;
 
 .controls button{
 font-weight: bold;
+cursor: pointer;
 }
 
 .controls .regular{
@@ -144,6 +203,45 @@ border-radius: 5px;
 border: 0px;
 font-size: 1.2rem;
 }
+
+.playlist{
+margin-top: 25px;  
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+}
+
+.playlist h2{
+padding: 10px;
+}
+
+.playlist .song{
+padding: 10px; 
+font-weight: bold; 
+cursor: pointer;
+font-size: 1.1rem;
+width: 100%;
+display: block;
+text-align: center;
+}
+
+.playlist .song-playing{
+ width: 100%; 
+ padding: 10px; 
+ font-weight: bold; 
+ cursor: pointer;
+ font-size: 1.1rem; 
+ color: #fff;
+ background-image: linear-gradient(to right, #CC2E5D, #FF5858); 
+ text-align: center;
+}
+
+.playlist .song:hover{
+color: #FF5858;  
+}
+
+
 
 
 </style>
