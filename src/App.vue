@@ -25,6 +25,7 @@
    <h2>The Playlist</h2>
    <p :key="song.src"
    v-for="song in songs"
+   @click="playMusic(song)"
    :class=" (current.src == song.src) ? 'song-playing' : 'song'"
    >{{song.title}} - {{song.artist}}</p>
    </section>
@@ -76,7 +77,21 @@ export default {
   methods: {
 
   // Start Playing current song
-  playMusic() {
+  playMusic(song) {
+  
+  // If src really contains a song
+  if(typeof song.src != 'undefined') {
+  // Put current song in the current object
+  this.current = song;
+  // Put current song src into player to play
+  this.player.src = this.current.src;
+  }
+
+
+  this.player.play();
+  this.isPlayed = true;
+
+
   this.player.play();
   this.isPlayed = true;
   },
@@ -113,7 +128,10 @@ export default {
   this.player.src = this.current.src;
   this.player.play();
   this.isPlayed = true;
-  }
+  },
+  
+
+
 
   },
 
@@ -174,6 +192,7 @@ font-weight: 700;
 .controls button{
 margin: 22px 10px;
 font-weight: bold;
+cursor: pointer;
 }
 
 .controls .prev, .next{
@@ -187,7 +206,7 @@ padding: 8px 15px;
 .controls .play{
 color: #fff;
 background: rgb(141, 1, 59);
-padding: 15px 25px;
+padding: 15px 17px;
 border: 0px;
 border-radius: 5px;
 font-size: 1.2rem;
@@ -207,6 +226,8 @@ margin: 12px auto;
 .playlist p{
 margin: 5px;
 font-size: 1.1rem;
+cursor: pointer;
+display: block;
 }
 
 .playlist .song:hover{
@@ -215,7 +236,8 @@ color: #FF5858;
 
 .playlist .song-playing{
  background-image: linear-gradient(to right, #CC2E5D, #FF5858);
-color: #fff;
+ color: #fff;
+ padding: 10px 10vw;
 }
 
 
